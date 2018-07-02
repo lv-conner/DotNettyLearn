@@ -52,6 +52,7 @@ namespace Echo.Server
                 }
                 else
                 {
+                    //使用TcpServerSocketChannel将导致监听IPV6地址。
                     bootstrap.Channel<TcpServerSocketChannel>();
                 }
 
