@@ -55,9 +55,13 @@ namespace Echo.Client
                     }));
 
                 IChannel clientChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8007));
+                Console.WriteLine("Client Start");
                 Console.ReadLine();
-
                 await clientChannel.CloseAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
             finally
             {
@@ -66,6 +70,14 @@ namespace Echo.Client
         }
 
         static void Main() => RunClientAsync().Wait();
+    }
+
+    public class FirstHandler: ChannelHandlerAdapter
+    {
+        public FirstHandler()
+        {
+
+        }
     }
 
     public class EchoClientHandler : ChannelHandlerAdapter
@@ -79,8 +91,19 @@ namespace Echo.Client
             this.initialMessage.WriteBytes(messageBytes);
         }
 
-        public override void ChannelActive(IChannelHandlerContext context) => context.WriteAndFlushAsync(this.initialMessage);
+        public override void ChannelActive(IChannelHandlerContext context)
+        {
+            context.WriteAndFlushAsync(initialMessage);
+        }
 
+        public override void ChannelInactive(IChannelHandlerContext context)
+        {
+            base.ChannelInactive(context);
+        }
+        public override void ChannelRegistered(IChannelHandlerContext context)
+        {
+            base.ChannelRegistered(context);
+        }
         public override void ChannelRead(IChannelHandlerContext context, object message)
         {
             var byteBuffer = message as IByteBuffer;
@@ -91,7 +114,10 @@ namespace Echo.Client
             context.WriteAsync(message);
         }
 
-        public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
+        public override void ChannelReadComplete(IChannelHandlerContext context)
+        {
+            context.Flush();
+        }
 
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {

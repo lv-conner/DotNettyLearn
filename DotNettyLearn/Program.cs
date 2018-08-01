@@ -74,10 +74,14 @@ namespace Echo.Server
                     }));
 
                 IChannel boundChannel = await bootstrap.BindAsync(8007);
-
+                Console.WriteLine("Server Start");
                 Console.ReadLine();
 
                 await boundChannel.CloseAsync();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
             finally
             {
